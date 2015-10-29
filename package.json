@@ -18,7 +18,9 @@
   "homepage": "https://github.com/hft-swp2-ws1516/db-api#readme",
   "devDependencies": {
     "async": "^1.5.0",
+    "express": "^4.13.3",
     "mongoose": "^4.2.3",
+    "morgan": "^1.6.1",
     "tldjs": "^1.6.0"
   }
 }
