@@ -1,0 +1,24 @@
+{
+  "name": "db-api",
+  "version": "0.0.1",
+  "description": "database api",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hft-swp2-ws1516/db-api.git"
+  },
+  "author": "hft-swp2-ws1516",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hft-swp2-ws1516/db-api/issues"
+  },
+  "homepage": "https://github.com/hft-swp2-ws1516/db-api#readme",
+  "devDependencies": {
+    "async": "^1.5.0",
+    "mongoose": "^4.2.3",
+    "tldjs": "^1.6.0"
+  }
+}
