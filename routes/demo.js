@@ -14,7 +14,6 @@ router.route('/')
 
         // db query
         TLSModel.find().limit(50).exec(function(err, entries) {
-            console.log(entries);
             if (err) { res.status(500).send(err); }
             res.status(200).json(entries);
             res.end();
