@@ -15,7 +15,8 @@ var ciphers = ['ECDHE-ECDSA-AES256-GCM-SHA384', 'ECDHE-ECDSA-AES128-GCM-SHA256',
 var mongohost='localhost:27017';
 var mongodb=process.env.TLSDB || 'tls';
 var mongoConnection='mongodb://' + mongohost + '/' + mongodb;
-mongoose.connect(mongoConnection);
+// connect
+if(mongoose.connection.readyState === 0) { mongoose.connect(mongoConnection); }
 
 // mongodb schema
 var TLSSchema = new mongoose.Schema({
