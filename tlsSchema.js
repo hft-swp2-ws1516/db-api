@@ -9,8 +9,16 @@ var TLSSchema = new mongoose.Schema({
     date: Date,
     source: String,
     dh_key: Number,
-    pref_cs: String,
-    avail_cs: [String]
+    pref_cs: {
+        cs: String,
+        tls_version: Number,
+        dh_param: Number,
+    },
+    avail_cs: [{
+        cs: String,
+        tls_version: Number,
+        dh_param: Number,
+    }]
 }, {
     toObject: { virtuals: true },
     toJSON: { virtuals: true }
