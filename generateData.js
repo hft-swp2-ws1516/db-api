@@ -28,31 +28,41 @@ function genEntry(callback) {
     // generate entry
     var entry = new TLSModel();
 
-    // generate date
-    entry.date = new Date();
-
     // random domain from array
     entry.domain = domains[Math.floor(Math.random()*domains.length)];
 
     // domain tld
     entry.tld = tldjs.getPublicSuffix(entry.domain);
 
-    // random pref_cs
-    entry.pref_cs = {
-        cs: ciphers[Math.floor(Math.random()*ciphers.length)],
-        tls_version: tls_versions[Math.floor(Math.random()*tls_versions.length)],
-        dh_param: dh_params[Math.floor(Math.random()*dh_params.length)]
-    };
+    // scans array
+    entry.scans = [];
 
-    // generate random ciphersuite list
-    async.each(ciphers.slice(1, Math.floor(Math.random()*ciphers.length)), function(cipher) {
-        var cipher_object = {
-            cs: cipher,
+    // generate some scans
+    for (var i = 0; i < 3; i++) {
+        var scan = {};
+
+        // date for the scan
+        scan.date = new Date();
+
+        // random pref_cs
+        scan.pref_cs = {
+            cs: ciphers[Math.floor(Math.random()*ciphers.length)],
             tls_version: tls_versions[Math.floor(Math.random()*tls_versions.length)],
             dh_param: dh_params[Math.floor(Math.random()*dh_params.length)]
         };
-        entry.avail_cs.push(cipher_object);
-    });
+
+        // generate random ciphersuite list
+        scan.avail_cs = [];
+        for (var j = 0; j < Math.floor(Math.random()*ciphers.length); j++) {
+            var cipher_object = {
+                cs: ciphers[Math.floor(Math.random()*ciphers.length)],
+                tls_version: tls_versions[Math.floor(Math.random()*tls_versions.length)],
+                dh_param: dh_params[Math.floor(Math.random()*dh_params.length)]
+            };
+            scan.avail_cs.push(cipher_object);
+        }
+        entry.scans.push(scan);
+    }
 
     // save to database
     entry.save(function (err) {
