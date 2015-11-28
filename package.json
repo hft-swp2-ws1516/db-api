@@ -22,5 +22,8 @@
     "mongoose": "^4.2.3",
     "morgan": "^1.6.1",
     "tldjs": "^1.6.0"
+  },
+  "dependencies": {
+    "apicache": "0.0.12"
   }
 }

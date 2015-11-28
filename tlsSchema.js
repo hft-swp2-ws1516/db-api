@@ -1,31 +1,40 @@
-'use strict';
+(function () {
+    'use strict';
 
-var mongoose = require('mongoose');
+    var mongoose = require('mongoose');
 
-// create mongodb schema for our news
-var TLSSchema = new mongoose.Schema({
-    domain: String,
-    tld: String,
-    scans: [{
-        date: Date,
-        source: String,
-        dh_key: Number,
-        pref_cs: {
-            cs: String,
-            tls_version: Number,
-            dh_param: Number,
+    // create mongodb schema for our news
+    var TLSSchema = new mongoose.Schema({
+        domain: String,
+        tld: String,
+        certificate: {
+            expired: Boolean,
+            issuer: String,
+            notValidAfeter: Date,
+            notValidBefore: Date,
+            signatureAlgorithm: String,
+            publicKeyAlgorithm: String,
+            publicKeyLength: Number,
+            subject: String
         },
-        avail_cs: [{
-            cs: String,
-            tls_version: Number,
-            dh_param: Number,
+        ciphers: [{
+            status : String,
+            bits : Number,
+            cipher : String,
+            curve : String,
+            protocol : String,
+            kx : String,
+            kxStrenght: Number,
+            au : String,
+            enc : String,
+            mac : String,
+            export : Boolean
         }]
-    }]
+    }, {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+    });
 
-}, {
-    toObject: { virtuals: true },
-    toJSON: { virtuals: true }
-});
-
-// create model from our schema & export it
-module.exports = mongoose.model('tls', TLSSchema);
+    // export the model
+    module.exports = mongoose.model('tls', TLSSchema);
+}());
