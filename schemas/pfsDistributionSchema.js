@@ -4,7 +4,7 @@
     var mongoose = require('mongoose');
 
     // create mongodb schema for our news
-    var domainSchema = new mongoose.Schema({
+    var schema = new mongoose.Schema({
         month: String,
         distribution: [{
             count: Number,
@@ -16,5 +16,5 @@
         toJSON: { virtuals: true }
     });
 
-    module.exports = mongoose.model('pfsDistribution', domainSchema);
+    module.exports = mongoose.model('PfsDistribution', schema);
 }());

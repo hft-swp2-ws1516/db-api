@@ -4,7 +4,7 @@
     var mongoose = require('mongoose');
 
     // create mongodb schema for our news
-    var domainSchema = new mongoose.Schema({
+    var schema = new mongoose.Schema({
         month: String,
         summary: [{
             count: Number,
@@ -17,5 +17,5 @@
         toJSON: { virtuals: true }
     });
 
-    module.exports = mongoose.model('cipherSummary', domainSchema);
+    module.exports = mongoose.model('CipherSummary', schema);
 }());

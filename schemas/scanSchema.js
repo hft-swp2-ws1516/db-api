@@ -4,7 +4,7 @@
     var mongoose = require('mongoose');
 
     // create mongodb schema for our news
-    var scanSchema = new mongoose.Schema({
+    var schema = new mongoose.Schema({
         sources: [String],
         scanDate: {type: Date, required: true},
         domain: {type: String, required: true},
@@ -40,5 +40,5 @@
         toJSON: { virtuals: true }
     });
 
-    module.exports = mongoose.model('Scan', scanSchema);
+    module.exports = mongoose.model('Scan', schema);
 }());

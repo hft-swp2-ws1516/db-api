@@ -2,7 +2,6 @@
     'use strict';
 
     var path = require('path');
-    var async = require('async');
     var mongoose = require('mongoose');
 
     var Scan = require('../schemas/scanSchema');

@@ -2,7 +2,6 @@
     'use strict';
 
     var path = require('path');
-    var async = require('async');
     var mongoose = require('mongoose');
 
     var Scan = require('../schemas/scanSchema');
@@ -17,11 +16,7 @@
         mongoose.connect('mongodb://localhost:27017/tls', function(err) {
             if (err) { throw err; }
             Scan.aggregate([
-                // only use data of the current month
-                { $match: {
-                    $or: [{"cipher.kx": "ECDH"}, {"cipher.kx": "DH"}]
-                }},
-                // kill duplicate scans for a domain, use the latest
+                // TODO: match only current month
                 { $sort: {scanDate: -1} },
                 { $group: {
                     _id: "$domain",
@@ -64,7 +59,6 @@
                 var d = new Date();
                 var pfsDistribution = new PfsDistribution();
                 pfsDistribution.month = d.getFullYear() + '_' + (d.getMonth()+1);
-                console.log(pfsDistribution.month);
                 pfsDistribution.distribution = result;
 
                 var plainData = pfsDistribution.toObject();
