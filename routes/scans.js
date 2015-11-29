@@ -1,8 +1,7 @@
 (function () {
     'use strict';
-    // import the express router
+
     var router = require('express').Router();
-    // create model
     var Scan = require('../schemas/scanSchema');
 
     router.route('/')

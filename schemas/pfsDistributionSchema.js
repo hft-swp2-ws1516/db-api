@@ -1,0 +1,20 @@
+(function () {
+    'use strict';
+
+    var mongoose = require('mongoose');
+
+    // create mongodb schema for our news
+    var domainSchema = new mongoose.Schema({
+        month: String,
+        distribution: [{
+            count: Number,
+            kx: String,
+            kxStrenght: String,
+        }]
+    }, {
+        toObject: { virtuals: true },
+        toJSON: { virtuals: true }
+    });
+
+    module.exports = mongoose.model('pfsDistribution', domainSchema);
+}());
