@@ -5,7 +5,7 @@
 
     router.route('/summary')
         .get(function(req, res, next) {
-            CipherSummary.find(function(err, result){
+            CipherSummary.find().exec(function(err, result){
                 if (err) { res.status(500).send(err); }
                 res.status(200).json(result);
                 res.end();
