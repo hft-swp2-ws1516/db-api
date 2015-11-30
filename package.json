@@ -24,6 +24,6 @@
     "tldjs": "^1.6.0"
   },
   "dependencies": {
-    "apicache": "0.0.12"
+    "moment": "^2.10.6"
   }
 }

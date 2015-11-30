@@ -2,6 +2,7 @@
     'use strict';
 
     var path = require('path');
+    var moment = require('moment');
     var mongoose = require('mongoose');
 
     var Scan = require('../schemas/scanSchema');
@@ -11,12 +12,22 @@
     var standalone = !module.parent;
     var scriptName = path.basename(module.filename, path.extname(module.filename));
 
+    // current month start and ends
+    var monthStart = moment().set({'date': 1, 'hour': 0, 'minute': 0, 'second': 1, 'millisecond': 0});
+    var monthEnd = moment(monthStart);
+    monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
+
     // main function
     var startQuery = function() {
         mongoose.connect('mongodb://localhost:27017/tls', function(err) {
             if (err) { throw err; }
             Scan.aggregate([
-                // TODO: match only current month
+                { $match: {
+                    $and: [
+                        {scanDate: {$gte: monthStart}},
+                        {scanDate: {$lte: monthEnd}}
+                    ]
+                }},
                 { $sort: {scanDate: -1} },
                 { $group: {
                     _id: "$domain",
