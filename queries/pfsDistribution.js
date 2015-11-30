@@ -35,21 +35,21 @@
                     _id: {
                         domain: "$domain",
                         kx: "$cipher.kx",
-                        kxStrenght: "$cipher.kxStrenght"
+                        kxStrength: "$cipher.kxStrength"
                     },
                     count: {$sum: 1}
                 }},
                 { $group: {
                     _id: {
                         kx: "$_id.kx",
-                        kxStrenght: "$_id.kxStrenght"
+                        kxStrength: "$_id.kxStrength"
                     },
                     count: {$sum: 1}
                 }},
                 { $project: {
                     _id: 0,
                     kx: "$_id.kx",
-                    kxStrenght: "$_id.kxStrenght",
+                    kxStrength: "$_id.kxStrength",
                     count: 1
                 }},
                 {

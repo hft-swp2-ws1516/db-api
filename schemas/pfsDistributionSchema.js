@@ -9,7 +9,7 @@
         distribution: [{
             count: Number,
             kx: String,
-            kxStrenght: String,
+            kxStrength: String,
         }]
     }, {
         toObject: { virtuals: true },

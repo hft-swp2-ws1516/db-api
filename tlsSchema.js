@@ -24,7 +24,7 @@
             curve : String,
             protocol : String,
             kx : String,
-            kxStrenght: Number,
+            kxStrength: Number,
             au : String,
             enc : String,
             mac : String,
