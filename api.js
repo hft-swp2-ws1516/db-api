@@ -4,9 +4,15 @@
     var fs = require('fs');
     var https = require('https');
     var async = require('async');
+    var morgan = require('morgan');
     var express = require('express');
     var mongoose = require('mongoose');
-    var morgan = require('morgan');
+    var schedule = require('node-schedule');
+
+    // queries
+    var qPfsOverview = require('./queries/pfsOverview');
+    var qCipherSummary = require('./queries/cipherSummary');
+    var qPfsDistribution = require('./queries/pfsDistribution');
 
     // api version & url
     var apiVersion = 0;
@@ -87,6 +93,13 @@
             console.error(err);
             res.status(500).send({ msg: 'big whoopsie!' });
         }
+    });
+
+    // setup cron jobs, run aggregators every 30 minutes
+    schedule.scheduleJob('*/30 * * * *', function(){
+        qPfsOverview.startQuery();
+        qCipherSummary.startQuery();
+        qPfsDistribution.startQuery();
     });
 
     // start the server
