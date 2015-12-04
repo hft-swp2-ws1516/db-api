@@ -7,6 +7,7 @@
     var schema = new mongoose.Schema({
         month: String,
         tld: String,
+        totalHosts: Number,
         summary: [{
             count: Number,
             cipher: String,
