@@ -39,6 +39,6 @@
         toObject: { virtuals: true },
         toJSON: { virtuals: true }
     });
-
+    schema.index({ tld: 1, scanDate: -1 });
     module.exports = mongoose.model('Scan', schema);
 }());

@@ -15,6 +15,6 @@
         toObject: { virtuals: true },
         toJSON: { virtuals: true }
     });
-
+    schema.index({ lastScanDate: 1});
     module.exports = mongoose.model('Domain', schema);
 }());
