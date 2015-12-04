@@ -70,22 +70,21 @@
                 $sort: {count: 1}
             }
         ]).allowDiskUse(true).exec(function(err, result) {
-            console.log(JSON.stringify(result, null, 2));
-            var d = new Date();
-            var cipherSummary = new CipherSummary();
+            for (var i = 0; i < result.length; i++) {
+                var currTldResult = result[i];
+                var cipherSummary = new CipherSummary();
+                cipherSummary.tld = currTldResult.tld;
+                cipherSummary.month = monthStart.year() + '_' + (monthStart.month()+1);
+                cipherSummary.summary = currTldResult.ciphers;
 
-            cipherSummary.month = d.getFullYear() + '_' + (d.getMonth()+1);
-            cipherSummary.summary = result;
+                var plainData = cipherSummary.toObject();
+                delete plainData._id;
+                delete plainData.id;
 
-            var plainData = cipherSummary.toObject();
-            delete plainData._id;
-
-            /*CipherSummary.findOneAndUpdate({month: cipherSummary.month}, plainData, {upsert:true}, function(err, doc){
-                if (err) { throw err; }
-                console.log("done...");
-                //mongoose.disconnect();
-            });*/
-
+                var findQuery = {month: cipherSummary.month, tld: cipherSummary.tld };
+                CipherSummary.findOneAndUpdate(findQuery, plainData, {upsert:true});
+                console.log("done");
+            }
         });
     };
 
