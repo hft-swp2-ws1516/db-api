@@ -102,8 +102,8 @@
                     delete plainData.id;
 
                     // upsert all the collected cipher summaries
-                    var findQuery = {month: cipherSummary.month, tld: cipherSummary.tld };
-                    CipherSummary.findOneAndUpdate(findQuery, plainData, {upsert: true, new: true}, function(err, doc) {
+                    var updateQuery = {month: cipherSummary.month, tld: cipherSummary.tld };
+                    CipherSummary.findOneAndUpdate(updateQuery, plainData, {upsert: true, new: true}, function(err, doc) {
                         if (err) { throw err; }
                         console.log("inserted a cipher summary for tld", doc.tld, "there are", count, "hosts");
                         callback();
