@@ -8,6 +8,8 @@
     var Scan = require('../schemas/scanSchema');
     var CipherSummary = require('../schemas/cipherSummarySchema');
 
+    var TLD_UNSPECIFIED = "__all";
+
     // running as module or standalone?
     var standalone = !module.parent;
     var scriptName = path.basename(module.filename, path.extname(module.filename));
@@ -59,7 +61,7 @@
         ]).allowDiskUse(true).exec(function(err, result) {
             var cipherSummary = new CipherSummary();
             cipherSummary.month = monthStart.year() + '_' + (monthStart.month()+1);
-            cipherSummary.tld = null;
+            cipherSummary.tld = TLD_UNSPECIFIED;
             cipherSummary.summary = result;
 
             // search for the number of all distinct domains
@@ -69,7 +71,7 @@
                     {scanDate: {$lte: monthEnd.toDate()}}
                 ]
             };
-            
+
             Scan.find(countQuery).distinct('domain').count(function(err, count) {
                 // prepare the data which we want to insert
                 var plainData = cipherSummary.toObject();
@@ -77,7 +79,8 @@
                 delete plainData._id;
                 delete plainData.id;
 
-                CipherSummary.findOneAndUpdate({month: cipherSummary.month}, plainData, {upsert:true}, function(err, doc) {
+                var updateQuery = { month: cipherSummary.month, tld: TLD_UNSPECIFIED };
+                CipherSummary.findOneAndUpdate(updateQuery, plainData, {upsert:true}, function(err, doc) {
                     if (err) { throw err; }
                     console.log('done');
                     if (standalone) { mongoose.disconnect(); }
