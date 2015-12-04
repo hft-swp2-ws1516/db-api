@@ -21,7 +21,7 @@
         }
 
         // current month start and ends
-        var monthStart = moment().set({'month': 10, 'date': 1, 'hour': 0, 'minute': 0, 'second': 1, 'millisecond': 0});
+        var monthStart = moment().set({'date': 1, 'hour': 0, 'minute': 0, 'second': 1, 'millisecond': 0});
 
         var monthEnd = moment(monthStart);
         monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
@@ -84,7 +84,7 @@
             }
 
             // for every collected cipher summary
-            async.eachLimit(cipherSummaries, 10, function(cipherSummary, callback){
+            async.eachLimit(cipherSummaries, 100, function(cipherSummary, callback){
                 // search for the number of domains with this tld
                 var countQuery = {
                     $and: [
