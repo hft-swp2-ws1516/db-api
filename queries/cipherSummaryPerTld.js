@@ -1,7 +1,9 @@
+/*jshint loopfunc: true */
 (function () {
     'use strict';
 
     var path = require('path');
+    var async = require('async');
     var moment = require('moment');
     var mongoose = require('mongoose');
 
@@ -70,6 +72,8 @@
                 $sort: {count: 1}
             }
         ]).allowDiskUse(true).exec(function(err, result) {
+            console.log("got documents for", result.length, "tlds");
+            var cipherSummaries = [];
             for (var i = 0; i < result.length; i++) {
                 var currTldResult = result[i];
                 var cipherSummary = new CipherSummary();
@@ -80,11 +84,21 @@
                 var plainData = cipherSummary.toObject();
                 delete plainData._id;
                 delete plainData.id;
-
-                var findQuery = {month: cipherSummary.month, tld: cipherSummary.tld };
-                CipherSummary.findOneAndUpdate(findQuery, plainData, {upsert:true});
-                console.log("done");
+                cipherSummaries.push(cipherSummary);
             }
+
+            // for every collected cipher summary
+            async.each(cipherSummaries, function(cipherSummary, callback){
+                var findQuery = {month: cipherSummary.month, tld: cipherSummary.tld };
+                CipherSummary.findOneAndUpdate(findQuery, plainData, {upsert: true, new:true}, function(err, doc) {
+                    if (err) { throw err; }
+                    console.log("inserted a cipher summary for tld", doc.tld);
+                    callback();
+                });
+            }, function(err) {
+                console.log("all done");
+                if (standalone) { mongoose.disconnect(); }
+            });
         });
     };
 
