@@ -57,19 +57,31 @@
                 $sort: {count: -1}
             }
         ]).allowDiskUse(true).exec(function(err, result) {
-            var d = new Date();
             var cipherSummary = new CipherSummary();
-
-            cipherSummary.month = d.getFullYear() + '_' + (d.getMonth()+1);
+            cipherSummary.month = monthStart.year() + '_' + (monthStart.month()+1);
+            cipherSummary.tld = null;
             cipherSummary.summary = result;
 
-            var plainData = cipherSummary.toObject();
-            delete plainData._id;
+            // search for the number of all distinct domains
+            var countQuery = {
+                $and: [
+                    {scanDate: {$gte: monthStart.toDate()}},
+                    {scanDate: {$lte: monthEnd.toDate()}}
+                ]
+            };
+            
+            Scan.find(countQuery).distinct('domain').count(function(err, count) {
+                // prepare the data which we want to insert
+                var plainData = cipherSummary.toObject();
+                plainData.totalHosts = count;
+                delete plainData._id;
+                delete plainData.id;
 
-            CipherSummary.findOneAndUpdate({month: cipherSummary.month}, plainData, {upsert:true}, function(err, doc){
-                if (err) { throw err; }
-                console.log("done...");
-                //mongoose.disconnect();
+                CipherSummary.findOneAndUpdate({month: cipherSummary.month}, plainData, {upsert:true}, function(err, doc) {
+                    if (err) { throw err; }
+                    console.log('done');
+                    if (standalone) { mongoose.disconnect(); }
+                });
             });
         });
     };
