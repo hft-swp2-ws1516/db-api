@@ -80,17 +80,21 @@
                 cipherSummary.tld = currTldResult.tld;
                 cipherSummary.month = monthStart.year() + '_' + (monthStart.month()+1);
                 cipherSummary.summary = currTldResult.ciphers;
-
-                var plainData = cipherSummary.toObject();
-                delete plainData._id;
-                delete plainData.id;
                 cipherSummaries.push(cipherSummary);
             }
 
+
+
             // for every collected cipher summary
-            async.each(cipherSummaries, function(cipherSummary, callback){
+            async.eachLimit(cipherSummaries, 10, function(cipherSummary, callback){
+                // prepare the data which we want to insert
+                var plainData = cipherSummary.toObject();
+                delete plainData._id;
+                delete plainData.id;
+
+                // upsert all the collected cipher summaries
                 var findQuery = {month: cipherSummary.month, tld: cipherSummary.tld };
-                CipherSummary.findOneAndUpdate(findQuery, plainData, {upsert: true, new:true}, function(err, doc) {
+                CipherSummary.findOneAndUpdate(findQuery, plainData, {upsert: true, new: true}, function(err, doc) {
                     if (err) { throw err; }
                     console.log("inserted a cipher summary for tld", doc.tld);
                     callback();
