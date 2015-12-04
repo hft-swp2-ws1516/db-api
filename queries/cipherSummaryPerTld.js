@@ -84,7 +84,7 @@
             }
 
             // for every collected cipher summary
-            async.eachLimit(cipherSummaries, 100, function(cipherSummary, callback){
+            async.eachLimit(cipherSummaries, 10, function(cipherSummary, callback){
                 // search for the number of domains with this tld
                 var countQuery = {
                     $and: [

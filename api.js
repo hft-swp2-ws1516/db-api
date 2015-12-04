@@ -12,6 +12,7 @@
     // queries
     var qPfsOverview = require('./queries/pfsOverview');
     var qCipherSummary = require('./queries/cipherSummary');
+    var qCipherSummaryPerTld = require('./queries/cipherSummaryPerTld');
     var qPfsDistribution = require('./queries/pfsDistribution');
 
     // api version & url
@@ -96,10 +97,11 @@
     });
 
     // setup cron jobs, run aggregators every 30 minutes
-    schedule.scheduleJob('*/30 * * * *', function(){
+    schedule.scheduleJob('*/45 * * * *', function(){
         qPfsOverview.startQuery();
         qCipherSummary.startQuery();
         qPfsDistribution.startQuery();
+        qCipherSummaryPerTld.startQuery();
     });
 
     // start the server
