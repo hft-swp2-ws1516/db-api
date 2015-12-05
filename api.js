@@ -14,6 +14,7 @@
     var qCipherSummary = require('./queries/cipherSummary');
     var qCipherSummaryPerTld = require('./queries/cipherSummaryPerTld');
     var qPfsDistribution = require('./queries/pfsDistribution');
+    var qExpOverview = require('./queries/expOverview');
 
     // api version & url
     var apiVersion = 0;
@@ -112,6 +113,14 @@
 
     schedule.scheduleJob('35 * * * *', function(){
         qPfsDistribution.startQuery();
+    });
+
+    schedule.scheduleJob('35 * * * *', function(){
+        qPfsDistribution.startQuery();
+    });
+
+    schedule.scheduleJob('45 * * * *', function(){
+        qExpOverview.startQuery();
     });
 
     // start the server
