@@ -96,12 +96,21 @@
         }
     });
 
-    // setup cron jobs, run aggregators every 30 minutes
-    schedule.scheduleJob('*/45 * * * *', function(){
+    // setup cron jobs for the aggregators
+    schedule.scheduleJob('5 * * * *', function(){
         qPfsOverview.startQuery();
+    });
+
+    schedule.scheduleJob('15 * * * *', function(){
         qCipherSummary.startQuery();
-        qPfsDistribution.startQuery();
+    });
+
+    schedule.scheduleJob('25 * * * *', function(){
         qCipherSummaryPerTld.startQuery();
+    });
+
+    schedule.scheduleJob('35 * * * *', function(){
+        qPfsDistribution.startQuery();
     });
 
     // start the server
