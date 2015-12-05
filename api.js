@@ -73,6 +73,7 @@
     router.use('/scans', require('./routes/scans'));
     router.use('/ciphers', require('./routes/ciphers'));
     router.use('/pfs', require('./routes/pfs'));
+    router.use('/exp', require('./routes/exp'));
 
     // register base & default router
     app.use(apiBaseUrl, router);
