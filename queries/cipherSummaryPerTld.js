@@ -28,10 +28,7 @@
 
         Scan.aggregate([
             { $match: {
-                $and: [
-                    {scanDate: {$gte: monthStart.toDate()}},
-                    {scanDate: {$lte: monthEnd.toDate()}}
-                ]
+                scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
             { $sort: {scanDate: -1} },
             { $group: {

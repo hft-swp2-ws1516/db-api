@@ -25,10 +25,7 @@
 
         Scan.aggregate([
             { $match: {
-                $and: [
-                    {scanDate: {$gte: monthStart.toDate()}},
-                    {scanDate: {$lte: monthEnd.toDate()}}
-                ]
+                scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
             { $sort: {scanDate: -1} },
             { $group: {
@@ -69,9 +66,8 @@
                 $sort: {count: -1}
             }
         ]).allowDiskUse(true).exec(function(err, result) {
-            var d = new Date();
             var pfsDistribution = new PfsDistribution();
-            pfsDistribution.month = d.getFullYear() + '_' + (d.getMonth()+1);
+            pfsDistribution.month = monthStart.year() + '_' + (monthStart.month()+1);
             pfsDistribution.distribution = result;
 
             var plainData = pfsDistribution.toObject();

@@ -25,10 +25,7 @@
 
         Scan.aggregate([
             { $match: {
-                    scanDate: {$gte: monthStart.toDate()}
-            }},
-            { $match: {
-                    scanDate: {$lte: monthEnd.toDate()}
+                    scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
             { $sort: {scanDate: -1} },
             { $group: {
@@ -72,10 +69,9 @@
                     count: {$sum: 1}
                 }}
             ]).allowDiskUse(true).exec(function(err, distinctHosts) {
-                var d = new Date();
                 var countTotal = distinctHosts[0].count;
                 var pfsOverview = new PfsOverview();
-                pfsOverview.month = d.getFullYear() + '_' + (d.getMonth()+1);
+                pfsOverview.month = monthStart.year() + '_' + (monthStart.month()+1);
                 pfsOverview.pfsEnabled = countEnabled;
                 pfsOverview.pfsDisabled = countTotal - countEnabled;
                 pfsOverview.total = countTotal;
