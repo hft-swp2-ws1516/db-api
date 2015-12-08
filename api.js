@@ -75,6 +75,7 @@
     router.use('/ciphers', require('./routes/ciphers'));
     router.use('/pfs', require('./routes/pfs'));
     router.use('/exp', require('./routes/exp'));
+    router.use('/mac', require('./routes/mac'));
 
     // register base & default router
     app.use(apiBaseUrl, router);

@@ -18,6 +18,9 @@
             mongoose.connect('mongodb://localhost:27017/tls');
         }
 
+        // log the currently executing aggregator
+        console.log('Aggregator started:', scriptName);
+
         // current month start and ends
         var monthStart = moment().set({'date': 1, 'hour': 0, 'minute': 0, 'second': 1, 'millisecond': 0});
         var monthEnd = moment(monthStart);
@@ -51,7 +54,6 @@
             }}
         ]).allowDiskUse(true).exec(function(err, result) {
             var countEnabled = result[0].count;
-            console.log("enabled", result);
 
             // count total distinct number of hosts
             Scan.aggregate([
@@ -82,7 +84,7 @@
 
                 ExpOverview.findOneAndUpdate({month: expOverview.month}, plainData, {upsert:true}, function(err, doc){
                     if (err) { throw err; }
-                    console.log('expOverview done');
+                    console.log('Aggregation done', scriptName);
                     if (standalone) { mongoose.disconnect(); }
                 });
             });

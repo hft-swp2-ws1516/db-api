@@ -6,7 +6,7 @@
     var mongoose = require('mongoose');
 
     var Scan = require('../schemas/scanSchema');
-    var PfsDistribution = require('../schemas/pfsDistributionSchema');
+    var MacDistribution = require('../schemas/macDistributionSchema');
 
     // running as module or standalone?
     var standalone = !module.parent;
@@ -41,42 +41,36 @@
                 domain: "$_id",
                 cipher: "$ciphers"
             }},
-            { $match: {
-                $or: [{"cipher.kx": "ECDH"}, {"cipher.kx": "DH"}]
-            }},
             { $group: {
                 _id: {
                     domain: "$domain",
-                    kx: "$cipher.kx",
-                    kxStrength: "$cipher.kxStrength"
+                    mac: "$cipher.mac"
                 },
                 count: {$sum: 1}
             }},
             { $group: {
                 _id: {
-                    kx: "$_id.kx",
-                    kxStrength: "$_id.kxStrength"
+                    mac: "$_id.mac"
                 },
                 count: {$sum: 1}
             }},
             { $project: {
                 _id: 0,
-                kx: "$_id.kx",
-                kxStrength: "$_id.kxStrength",
+                mac: "$_id.mac",
                 count: 1
             }},
             {
                 $sort: {count: -1}
             }
         ]).allowDiskUse(true).exec(function(err, result) {
-            var pfsDistribution = new PfsDistribution();
-            pfsDistribution.month = monthStart.year() + '_' + (monthStart.month()+1);
-            pfsDistribution.distribution = result;
+            var macDistribution = new MacDistribution();
+            macDistribution.month = monthStart.year() + '_' + (monthStart.month()+1);
+            macDistribution.distribution = result;
 
-            var plainData = pfsDistribution.toObject();
+            var plainData = macDistribution.toObject();
             delete plainData._id;
 
-            PfsDistribution.findOneAndUpdate({month: pfsDistribution.month}, plainData, {upsert:true}, function(err, doc){
+            MacDistribution.findOneAndUpdate({month: macDistribution.month}, plainData, {upsert:true}, function(err, doc){
                 if (err) { throw err; }
                 console.log('Aggregation done', scriptName);
                 if (standalone) { mongoose.disconnect(); }

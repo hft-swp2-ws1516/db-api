@@ -20,6 +20,9 @@
             mongoose.connect('mongodb://localhost:27017/tls');
         }
 
+        // log the currently executing aggregator
+        console.log('Aggregator started:', scriptName);
+
         // current month start and ends
         var monthStart = moment().set({'date': 1, 'hour': 0, 'minute': 0, 'second': 1, 'millisecond': 0});
         var monthEnd = moment(monthStart);
@@ -79,7 +82,7 @@
                 var updateQuery = { month: cipherSummary.month, tld: TLD_UNSPECIFIED };
                 CipherSummary.findOneAndUpdate(updateQuery, plainData, {upsert:true}, function(err, doc) {
                     if (err) { throw err; }
-                    console.log('done');
+                    console.log('Aggregation done', scriptName);
                     if (standalone) { mongoose.disconnect(); }
                 });
             });
