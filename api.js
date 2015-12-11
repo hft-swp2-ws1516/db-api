@@ -8,13 +8,7 @@
     var express = require('express');
     var mongoose = require('mongoose');
     var schedule = require('node-schedule');
-
-    // queries
-    var qPfsOverview = require('./queries/pfsOverview');
-    var qCipherSummary = require('./queries/cipherSummary');
-    var qCipherSummaryPerTld = require('./queries/cipherSummaryPerTld');
-    var qPfsDistribution = require('./queries/pfsDistribution');
-    var qExpOverview = require('./queries/expOverview');
+    var spawn = require('child_process').spawn;
 
     // api version & url
     var apiVersion = 0;
@@ -101,27 +95,27 @@
 
     // setup cron jobs for the aggregators
     schedule.scheduleJob('5 * * * *', function(){
-        qPfsOverview.startQuery();
+        spawn('node', ['./queries/pfsOverview'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('15 * * * *', function(){
-        qCipherSummary.startQuery();
+        spawn('node', ['./queries/cipherSummary'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('25 * * * *', function(){
-        qCipherSummaryPerTld.startQuery();
+        spawn('node', ['./queries/cipherSummaryPerTld'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('35 * * * *', function(){
-        qPfsDistribution.startQuery();
-    });
-
-    schedule.scheduleJob('35 * * * *', function(){
-        qPfsDistribution.startQuery();
+        spawn('node', ['./queries/pfsDistribution'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('45 * * * *', function(){
-        qExpOverview.startQuery();
+        spawn('node', ['./queries/expOverview'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('55 * * * *', function(){
+        spawn('node', ['./queries/macDistribution'], { stdio: 'inherit' });
     });
 
     // start the server
