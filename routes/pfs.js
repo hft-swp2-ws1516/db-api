@@ -22,7 +22,7 @@
                 { $group: {
                     _id: "$month",
                     overviews: {$push: "$$ROOT"},
-                    monthlyTotalHosts: {$sum: "$total"},
+                    monthlyTotalHosts: {$sum: "$totalHosts"},
                     monthlyPfsEnabled: {$sum: "$pfsEnabled"},
                     monthlyPfsDisabled: {$sum: "$pfsDisabled"}
                 }},

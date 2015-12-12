@@ -9,7 +9,7 @@
         tld: String,
         pfsEnabled: Number,
         pfsDisabled: Number,
-        total: Number
+        totalHosts: Number
     }, {
         toObject: { virtuals: true },
         toJSON: { virtuals: true }
