@@ -27,8 +27,13 @@
         monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
 
         Scan.aggregate([
+            // match all scans in the current month which have export enabled
             { $match: {
-                    scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
+                scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()},
+                ciphers: {$elemMatch: {
+                    export: true,
+                    status: {$in: ["accepted", "preferred"]}
+                }}
             }},
             { $sort: {scanDate: -1} },
             { $group: {
@@ -41,10 +46,6 @@
                 domain: "$_id",
                 cipher: "$ciphers"
             }},
-            { $match: {
-                "cipher.export": true,
-                "cipher.status": {$in: ["accepted", "preferred"]}
-            }},
             { $group: {
                 _id: "$domain",
             }},
@@ -54,6 +55,7 @@
             }}
         ]).allowDiskUse(true).exec(function(err, result) {
             var countEnabled = result[0].count;
+            console.log(countEnabled);
 
             // count total distinct number of hosts
             Scan.aggregate([
