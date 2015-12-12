@@ -2,6 +2,7 @@
     'use strict';
 
     var path = require('path');
+    var async = require('async');
     var moment = require('moment');
     var mongoose = require('mongoose');
 
@@ -11,8 +12,6 @@
     // running as module or standalone?
     var standalone = !module.parent;
     var scriptName = path.basename(module.filename, path.extname(module.filename));
-
-    var TLD_UNSPECIFIED = "__all";
 
     // main function
     var startQuery = function() {
@@ -30,67 +29,74 @@
 
         Scan.aggregate([
             { $match: {
-                    scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
+                scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
-                ciphers: {$first: "$ciphers" }
+                ciphers: { $first: "$ciphers" },
+                tld: { $first: "$tld" },
             }},
             { $unwind : "$ciphers" },
             { $project: {
                 _id: 0,
                 domain: "$_id",
-                cipher: "$ciphers"
+                cipher: "$ciphers",
+                tld: "$tld"
             }},
             { $match: {
                 $or: [{"cipher.kx": "ECDH"}, {"cipher.kx": "DH"}]
             }},
             { $group: {
                 _id: "$domain",
+                tld: {$first: "$tld" },
             }},
             { $group: {
-                _id: null,
-                count: {$sum: 1}
+                _id: "$tld",
+                count: { $sum: 1 }
             }}
         ]).allowDiskUse(true).exec(function(err, result) {
-            var countEnabled = result[0].count;
-            console.log("enabled", result);
 
-            // count total distinct number of hosts
-            Scan.aggregate([
-                { $match: {
-                    $and: [
-                        {scanDate: {$gte: monthStart.toDate()}},
-                        {scanDate: {$lte: monthEnd.toDate()}}
-                    ]
-                }},
-                { $sort: {scanDate: -1} },
-                { $group: {
-                    _id: "$domain",
-                }},
-                { $group: {
-                    _id: null,
-                    count: {$sum: 1}
-                }}
-            ]).allowDiskUse(true).exec(function(err, distinctHosts) {
-                var countTotal = distinctHosts[0].count;
-                var pfsOverview = new PfsOverview();
-                pfsOverview.month = monthStart.year() + '_' + (monthStart.month()+1);
-                pfsOverview.pfsEnabled = countEnabled;
-                pfsOverview.pfsDisabled = countTotal - countEnabled;
-                pfsOverview.total = countTotal;
-                pfsOverview.tld = TLD_UNSPECIFIED;
+            // count total hosts for every tld
+            async.eachLimit(result, 10, function(tld, callback){
+                Scan.aggregate([
+                    // only match these scans from the current month, matching the top level domain
+                    { $match: {
+                        scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()},
+                        tld: tld._id
+                    }},
+                    // group by domain, so we have every host only one time
+                    { $group: {
+                        _id: "$domain"
+                    }},
+                    // just count the result (our number of hosts matching this top level domain)
+                    { $group: {
+                        _id: null,
+                        count: {$sum: 1}
+                    }}
+                ]).allowDiskUse(true).exec(function(err, totalHostCount) {
+                    console.log(tld, totalHostCount);
 
-                var plainData = pfsOverview.toObject();
-                delete plainData._id;
-                delete plainData.id;
+                    var pfsOverview = new PfsOverview();
+                    pfsOverview.month = monthStart.year() + '_' + (monthStart.month()+1);
+                    pfsOverview.tld = tld._id;
+                    pfsOverview.pfsEnabled = tld.count;
+                    pfsOverview.pfsDisabled = totalHostCount.count - pfsOverview.pfsEnabled;
+                    pfsOverview.total = totalHostCount.count;
 
-                PfsOverview.findOneAndUpdate({month: pfsOverview.month}, plainData, {upsert:true}, function(err, doc){
-                    if (err) { throw err; }
-                    console.log('Aggregation done', scriptName);
-                    if (standalone) { mongoose.disconnect(); }
+                    var plainData = pfsOverview.toObject();
+                    delete plainData._id;
+                    delete plainData.id;
+
+                    var upsertQuery = {month: pfsOverview.month, tld: pfsOverview.tld };
+                    PfsOverview.findOneAndUpdate(upsertQuery, plainData, {upsert:true}, function(err, doc){
+                        if (err) { throw err; }
+                        callback();
+                    });
                 });
+            }, function(err) {
+                console.log('Aggregation done', scriptName);
+                if (standalone) { mongoose.disconnect(); }
             });
         });
     };

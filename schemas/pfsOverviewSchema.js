@@ -15,5 +15,11 @@
         toJSON: { virtuals: true }
     });
 
+    schema.options.toJSON.transform = function (doc, ret, options) {
+        // remove the _id of every document before returning the result
+        delete ret._id;
+        delete ret.id;
+    };
+
     module.exports = mongoose.model('PfsOverview', schema);
 }());

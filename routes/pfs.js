@@ -17,11 +17,23 @@
 
     router.route('/overview')
         .get(function(req, res, next) {
-            var query = {
-                tld: TLD_UNSPECIFIED
-            };
 
-            PfsOverview.find(query).exec(function(err, result){
+            PfsOverview.aggregate([
+                { $group: {
+                    _id: "$month",
+                    overviews: {$push: "$$ROOT"},
+                    monthlyTotalHosts: {$sum: "$total"},
+                    monthlyPfsEnabled: {$sum: "$pfsEnabled"},
+                    monthlyPfsDisabled: {$sum: "$pfsDisabled"}
+                }},
+                { $project: {
+                    month: "$_id",
+                    overviews: 1,
+                    monthlyTotalHosts: 1,
+                    monthlyPfsEnabled: 1,
+                    monthlyPfsDisabled: 1
+                }}
+            ]).exec(function(err, result) {
                 if (err) { res.status(500).send(err); }
                 res.status(200).json(result);
                 res.end();
