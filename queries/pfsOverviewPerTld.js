@@ -88,7 +88,8 @@
                     delete plainData._id;
                     delete plainData.id;
 
-                    PfsOverview.findOneAndUpdate({month: pfsOverview.month}, plainData, {upsert:true}, function(err, doc){
+                    var upsertQuery = {month: pfsOverview.month, tld: pfsOverview.tld };
+                    PfsOverview.findOneAndUpdate(upsertQuery, plainData, {upsert:true}, function(err, doc){
                         if (err) { throw err; }
                         callback();
                     });
