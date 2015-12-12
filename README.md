@@ -1,5 +1,5 @@
 # API
-For simplicity the API is currently hosted on a Digital Ocean Droplet: http://tls.thejetlag.de:1337/api/v0/
+The API is currently running here: http://h2511680.stratoserver.net:1337/api/v0/, but feel free to run your local one.
 
 ## Setup
 - Fill your mongoDB with scan objects from the tls crawler of your confidence
