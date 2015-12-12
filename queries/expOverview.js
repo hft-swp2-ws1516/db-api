@@ -35,20 +35,25 @@
                     status: {$in: ["accepted", "preferred"]}
                 }}
             }},
+            // get the distinct, newest scan of every domain
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
                 ciphers: {$first: "$ciphers" }
             }},
+            // unwind every cipher
             { $unwind : "$ciphers" },
+            // cosmetics
             { $project: {
                 _id: 0,
                 domain: "$_id",
                 cipher: "$ciphers"
             }},
+            // group by domain
             { $group: {
                 _id: "$domain",
             }},
+            // just count the result
             { $group: {
                 _id: null,
                 count: {$sum: 1}
@@ -74,6 +79,7 @@
                     count: {$sum: 1}
                 }}
             ]).allowDiskUse(true).exec(function(err, distinctHosts) {
+                // prepare a ExpOverview object
                 var countTotal = distinctHosts[0].count;
                 var expOverview = new ExpOverview();
                 expOverview.month = monthStart.year() + '_' + (monthStart.month()+1);
@@ -81,9 +87,11 @@
                 expOverview.expDisabled = countTotal - countEnabled;
                 expOverview.total = countTotal;
 
+                // get plain data, which we will insert into mongo
                 var plainData = expOverview.toObject();
                 delete plainData._id;
 
+                // save the aggregated data to mongo
                 ExpOverview.findOneAndUpdate({month: expOverview.month}, plainData, {upsert:true}, function(err, doc){
                     if (err) { throw err; }
                     console.log('Aggregation done', scriptName);

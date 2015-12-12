@@ -27,20 +27,25 @@
         monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
 
         Scan.aggregate([
+            // match all documents in the current month
             { $match: {
                 scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
+            // get the distinct, newest scan of every domain
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
                 ciphers: {$first: "$ciphers" }
             }},
+            // undwind every cipher
             { $unwind : "$ciphers" },
+            // cosmetics
             { $project: {
                 _id: 0,
                 domain: "$_id",
                 cipher: "$ciphers"
             }},
+            // group by domain and mac
             { $group: {
                 _id: {
                     domain: "$domain",
@@ -48,12 +53,14 @@
                 },
                 count: {$sum: 1}
             }},
+            // count the macs
             { $group: {
                 _id: {
                     mac: "$_id.mac"
                 },
                 count: {$sum: 1}
             }},
+            // cosmetics
             { $project: {
                 _id: 0,
                 mac: "$_id.mac",

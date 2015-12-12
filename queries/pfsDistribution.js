@@ -27,23 +27,29 @@
         monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
 
         Scan.aggregate([
+            // match all documents in the current month
             { $match: {
                 scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
+            // get the distinct, newest scan of every domain
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
                 ciphers: {$first: "$ciphers" }
             }},
+            // unwind every cipher
             { $unwind : "$ciphers" },
+            // cosmetics
             { $project: {
                 _id: 0,
                 domain: "$_id",
                 cipher: "$ciphers"
             }},
+            // match every pfs enabled cipher
             { $match: {
                 $or: [{"cipher.kx": "ECDH"}, {"cipher.kx": "DH"}]
             }},
+            // group by domain, kx and strenght
             { $group: {
                 _id: {
                     domain: "$domain",
@@ -52,6 +58,7 @@
                 },
                 count: {$sum: 1}
             }},
+            // now count per kx & strenght
             { $group: {
                 _id: {
                     kx: "$_id.kx",
@@ -59,6 +66,7 @@
                 },
                 count: {$sum: 1}
             }},
+            // cosmetics
             { $project: {
                 _id: 0,
                 kx: "$_id.kx",

@@ -32,7 +32,7 @@
             { $match: {
                 scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
-            // get the distinct, newest of every domain
+            // get the distinct, newest scan of every domain
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
@@ -63,8 +63,7 @@
                 count: { $sum: 1 }
             }}
         ]).allowDiskUse(true).exec(function(err, result) {
-
-            // now for every result, count the total hosts of the tld
+            // now count the total hosts for every tld
             async.eachLimit(result, 10, function(tld, callback){
                 Scan.aggregate([
                     // only match these scans from the current month, matching the top level domain
@@ -82,9 +81,13 @@
                         count: {$sum: 1}
                     }}
                 ]).allowDiskUse(true).exec(function(err, totalHostCount) {
+                    // extract number of host with the current tld which have pfs enabled
                     var pfsEnabled = tld.count;
+
+                    // extract the total hosts in the current tld
                     var totalHosts = totalHostCount[0].count;
 
+                    // prepare a pfsOverview object
                     var pfsOverview = new PfsOverview();
                     pfsOverview.month = monthStart.year() + '_' + (monthStart.month()+1);
                     pfsOverview.tld = tld._id;
@@ -92,6 +95,7 @@
                     pfsOverview.totalHosts = totalHosts;
                     pfsOverview.pfsDisabled = pfsOverview.totalHosts - pfsOverview.pfsEnabled;
 
+                    // get plain data, which we will insert into mongo
                     var plainData = pfsOverview.toObject();
                     delete plainData._id;
 

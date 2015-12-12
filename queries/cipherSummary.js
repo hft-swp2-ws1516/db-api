@@ -29,15 +29,19 @@
         monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
 
         Scan.aggregate([
+            // match all documents in the current month
             { $match: {
                 scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
+            // get the distinct, newest of every domain
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
                 ciphers: {$first: "$ciphers" }
             }},
+            // unwind every cipher
             { $unwind : "$ciphers" },
+            // group by cipher, protocol and status
             { $group: {
                 _id: {
                     cipher: "$ciphers.cipher",
@@ -46,6 +50,7 @@
                 },
                 count: {$sum: 1}
             }},
+            // cosmetics
             {
                 $project: {
                     _id: 0,
@@ -55,10 +60,12 @@
                     count: 1
                 }
             },
+            // sort desc by the count field
             {
                 $sort: {count: -1}
             }
         ]).allowDiskUse(true).exec(function(err, result) {
+            // prepare CipherSummary object
             var cipherSummary = new CipherSummary();
             cipherSummary.month = monthStart.year() + '_' + (monthStart.month()+1);
             cipherSummary.tld = TLD_UNSPECIFIED;
@@ -79,8 +86,9 @@
                 delete plainData._id;
                 delete plainData.id;
 
-                var updateQuery = { month: cipherSummary.month, tld: TLD_UNSPECIFIED };
-                CipherSummary.findOneAndUpdate(updateQuery, plainData, {upsert:true}, function(err, doc) {
+                // save the aggregated data to mongo
+                var upsertQuery = { month: cipherSummary.month, tld: TLD_UNSPECIFIED };
+                CipherSummary.findOneAndUpdate(upsertQuery, plainData, {upsert:true}, function(err, doc) {
                     if (err) { throw err; }
                     console.log('Aggregation done', scriptName);
                     if (standalone) { mongoose.disconnect(); }

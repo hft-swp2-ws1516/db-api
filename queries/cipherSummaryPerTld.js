@@ -30,16 +30,20 @@
         monthEnd = monthEnd.add(1, 'months').subtract(2, 'seconds');
 
         Scan.aggregate([
+            // only match these scans from the current month, matching the top level domain
             { $match: {
                 scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}
             }},
+            // get the distinct, newest scan of every domain
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
                 tld: {$first: "$tld" },
                 ciphers: {$first: "$ciphers" }
             }},
+            // unwind every cipher
             { $unwind : "$ciphers" },
+            // group by tld, cipher, protocol, status
             { $group: {
                 _id: {
                     tld: "$tld",
@@ -49,6 +53,7 @@
                 },
                 count: {$sum: 1}
             }},
+            // cosmetics
             {
                 $project: {
                     _id: 0,
@@ -59,6 +64,7 @@
                     count: 1
                 }
             },
+            // collect every cipher per tld
             { $group: {
                 _id: "$tld",
                 ciphers: { $push: "$$ROOT"}
@@ -94,6 +100,7 @@
                     tld: cipherSummary.tld
                 };
 
+                // count the number of distinct domains in this tld
                 Scan.find(countQuery).distinct('domain').count(function(err, count) {
                     // prepare the data which we want to insert
                     var plainData = cipherSummary.toObject();
