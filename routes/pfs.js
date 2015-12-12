@@ -4,6 +4,8 @@
     var PfsDistribution = require('../schemas/pfsDistributionSchema');
     var PfsOverview = require('../schemas/pfsOverviewSchema');
 
+    var TLD_UNSPECIFIED = "__all";
+
     router.route('/distribution')
         .get(function(req, res, next) {
             PfsDistribution.find().exec(function(err, result){
@@ -15,7 +17,11 @@
 
     router.route('/overview')
         .get(function(req, res, next) {
-            PfsOverview.find().exec(function(err, result){
+            var query = {
+                tld: TLD_UNSPECIFIED
+            };
+
+            PfsOverview.find(query).exec(function(err, result){
                 if (err) { res.status(500).send(err); }
                 res.status(200).json(result);
                 res.end();

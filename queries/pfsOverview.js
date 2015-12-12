@@ -12,6 +12,8 @@
     var standalone = !module.parent;
     var scriptName = path.basename(module.filename, path.extname(module.filename));
 
+    var TLD_UNSPECIFIED = "__all";
+
     // main function
     var startQuery = function() {
         if (mongoose.connection.readyState === 0) {
@@ -78,9 +80,11 @@
                 pfsOverview.pfsEnabled = countEnabled;
                 pfsOverview.pfsDisabled = countTotal - countEnabled;
                 pfsOverview.total = countTotal;
+                pfsOverview.tld = TLD_UNSPECIFIED;
 
                 var plainData = pfsOverview.toObject();
                 delete plainData._id;
+                delete plainData.id;
 
                 PfsOverview.findOneAndUpdate({month: pfsOverview.month}, plainData, {upsert:true}, function(err, doc){
                     if (err) { throw err; }
