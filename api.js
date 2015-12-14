@@ -114,8 +114,12 @@
         spawn('node', ['./queries/expOverview.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('55 * * * *', function(){
+    schedule.scheduleJob('50 * * * *', function(){
         spawn('node', ['./queries/macDistributionGlobal.js'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('55 * * * *', function(){
+        spawn('node', ['./queries/macDistributionPerTld.js'], { stdio: 'inherit' });
     });
 
     // start the server
