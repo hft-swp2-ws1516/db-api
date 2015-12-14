@@ -6,6 +6,7 @@
     // create mongodb schema for our news
     var schema = new mongoose.Schema({
         month: String,
+        tld: String,
         distribution: [{
             count: Number,
             mac: String

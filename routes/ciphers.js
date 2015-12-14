@@ -8,10 +8,8 @@
 
     router.route('/summary')
         .get(function(req, res, next) {
-
-            var tld = req.query.tld || TLD_UNSPECIFIED;
             var query = {
-                tld: tld
+                tld: req.query.tld || TLD_UNSPECIFIED
             };
 
             CipherSummary.find(query).exec(function(err, result){

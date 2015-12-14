@@ -8,6 +8,8 @@
     var Scan = require('../schemas/scanSchema');
     var MacDistribution = require('../schemas/macDistributionSchema');
 
+    var TLD_UNSPECIFIED = "__all";
+
     // running as module or standalone?
     var standalone = !module.parent;
     var scriptName = path.basename(module.filename, path.extname(module.filename));
@@ -73,6 +75,7 @@
             var macDistribution = new MacDistribution();
             macDistribution.month = monthStart.year() + '_' + (monthStart.month()+1);
             macDistribution.distribution = result;
+            macDistribution.tld = TLD_UNSPECIFIED;
 
             var plainData = macDistribution.toObject();
             delete plainData._id;

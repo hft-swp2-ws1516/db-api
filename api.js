@@ -99,7 +99,7 @@
     });
 
     schedule.scheduleJob('15 * * * *', function(){
-        spawn('node', ['./queries/cipherSummary.js'], { stdio: 'inherit' });
+        spawn('node', ['./queries/cipherSummaryGlobal.js'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('25 * * * *', function(){
@@ -115,7 +115,7 @@
     });
 
     schedule.scheduleJob('55 * * * *', function(){
-        spawn('node', ['./queries/macDistribution.js'], { stdio: 'inherit' });
+        spawn('node', ['./queries/macDistributionGlobal.js'], { stdio: 'inherit' });
     });
 
     // start the server
