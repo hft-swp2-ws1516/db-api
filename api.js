@@ -94,31 +94,31 @@
     });
 
     // setup cron jobs for the aggregators
-    schedule.scheduleJob('5 * * * *', function(){
+    schedule.scheduleJob('5 3 * * *', function(){
         spawn('node', ['./queries/pfsOverview.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('15 * * * *', function(){
+    schedule.scheduleJob('15 3 * * *', function(){
         spawn('node', ['./queries/cipherSummaryGlobal.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('25 * * * *', function(){
+    schedule.scheduleJob('25 3 * * *', function(){
         spawn('node', ['./queries/cipherSummaryPerTld.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('35 * * * *', function(){
+    schedule.scheduleJob('35 3 * * *', function(){
         spawn('node', ['./queries/pfsDistribution.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('45 * * * *', function(){
+    schedule.scheduleJob('45 3 * * *', function(){
         spawn('node', ['./queries/expOverview.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('50 * * * *', function(){
+    schedule.scheduleJob('50 3 * * *', function(){
         spawn('node', ['./queries/macDistributionGlobal.js'], { stdio: 'inherit' });
     });
 
-    schedule.scheduleJob('55 * * * *', function(){
+    schedule.scheduleJob('55 3 * * *', function(){
         spawn('node', ['./queries/macDistributionPerTld.js'], { stdio: 'inherit' });
     });
 
