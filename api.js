@@ -107,7 +107,11 @@
     });
 
     schedule.scheduleJob('35 3 * * *', function(){
-        spawn('node', ['./queries/pfsDistribution.js'], { stdio: 'inherit' });
+        spawn('node', ['./queries/pfsDistributionGlobal.js'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('40 3 * * *', function(){
+        spawn('node', ['./queries/pfsDistributionPerTld.js'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('45 3 * * *', function(){
