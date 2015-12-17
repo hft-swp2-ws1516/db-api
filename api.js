@@ -70,6 +70,8 @@
     router.use('/pfs', require('./routes/pfs'));
     router.use('/exp', require('./routes/exp'));
     router.use('/mac', require('./routes/mac'));
+    router.use('/keysize', require('./routes/keysize'));
+    
 
     // register base & default router
     app.use(apiBaseUrl, router);
