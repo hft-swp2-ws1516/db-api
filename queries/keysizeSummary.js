@@ -29,11 +29,34 @@
 		                {$group: { "_id": "$certificate.publicKeyLength", "totalAmount": {$sum: 1}}}
 		                ]
 		).allowDiskUse(true).exec(function(err, result) {
-			console.log(result)
-			var keysizeSummary = new KeysizeSummary();
-			// TODO: fill the summary Object and push to DB
-			console.log('Aggregation done', scriptName);
-			if (standalone) { mongoose.disconnect(); }
+//			console.log(result.length)
+			var keySummaries = [];
+			for (var i = 0; i < result.length; i++) {
+				var kz = new KeysizeSummary();
+				kz.publicKeyLength = result[i]._id; 
+				kz.totalAmount = result[i].totalAmount;
+				keySummaries.push(kz)
+			}
+			
+			// for every collected cipher summary
+            async.eachLimit(keySummaries , result.length, function(kz, callback) {
+//				console.log(kz)
+				var plainData = kz.toObject();
+				delete plainData._id;
+                delete plainData.id;
+                
+				var updateQuery = {publicKeyLength: kz.publicKeyLength};
+				KeysizeSummary.findOneAndUpdate(updateQuery, 
+						plainData, 
+						{upsert: true, new: true}, 
+						function(err, doc) {
+					if (err) { throw err; }
+                    callback();
+				});
+            }, function(err) {
+            	console.log('Aggregation done', scriptName);
+            	if (standalone) { mongoose.disconnect(); }
+            });
 		});
 	};
 		
