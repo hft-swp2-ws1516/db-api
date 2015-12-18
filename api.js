@@ -71,7 +71,7 @@
     router.use('/exp', require('./routes/exp'));
     router.use('/mac', require('./routes/mac'));
     router.use('/keysize', require('./routes/keysize'));
-    
+    router.use('/hostcount', require('./routes/hostcount'));
 
     // register base & default router
     app.use(apiBaseUrl, router);
