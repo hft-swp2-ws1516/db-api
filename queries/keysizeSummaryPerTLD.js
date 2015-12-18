@@ -9,10 +9,12 @@
 
     var Scan = require('../schemas/scanSchema');
     var KeysizeTLD = require('../schemas/keysizeTLDSchema');
-
+    
+    // running as module or standalone?
     var standalone = !module.parent;
     var scriptName = path.basename(module.filename, path.extname(module.filename));
 
+    // main function
     var startQuery = function() {
 	if (mongoose.connection.readyState === 0) {
 	    mongoose.connect('mongodb://localhost:27017/tls');
@@ -28,8 +30,8 @@
 	// start aggregating the data
 	Scan.aggregate([
 	    {$match: {scanError: false}}, // we are interested in Scans without Errors
-//	    {$match: {scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}}}, // our scan range
-	    { $sort: {scanDate: -1} },
+	    {$match: {scanDate: {$gte: monthStart.toDate(), $lte: monthEnd.toDate()}}}, // our scan range
+	    {$sort: {scanDate: -1} },
 	    {$group: {
 		_id: "$domain",
 		tld: {$first: "$tld"},
@@ -61,8 +63,8 @@
 	]).allowDiskUse(true).exec(function(err, result) {
 //	    console.log(result)
 	    var keysizeTLDcollection = [];
-	    // filling a list with results using KeysizeTLDSchema
 	    for (var i = 0; i < result.length; i++) {
+		// filling a list with results using KeysizeTLDSchema
 		var keysizeTLD = new KeysizeTLD();
 		keysizeTLD.tld = result[i].tld;
 		keysizeTLD.month = monthStart.year() + '_' + (monthStart.month()+1);
@@ -86,7 +88,7 @@
 			function(err, doc) {
 			    if (err) { throw err; }
 				callback();
-			    });
+			});
             }, function(err) {
             	console.log('Aggregation done', scriptName);
             	if (standalone) { mongoose.disconnect(); }
