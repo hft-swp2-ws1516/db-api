@@ -128,6 +128,10 @@
         spawn('node', ['./queries/macDistributionPerTld.js'], { stdio: 'inherit' });
     });
 
+    schedule.scheduleJob('0 4 * * *', function(){
+        spawn('node', ['./queries/hostCount.js'], { stdio: 'inherit' });
+    });
+
     // start the server
     console.log('\n* starting the tls api\n');
     console.log('  mongodb:  ' + mongoConnection);
