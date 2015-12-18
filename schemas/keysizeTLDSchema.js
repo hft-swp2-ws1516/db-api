@@ -5,11 +5,13 @@
     var Schema = mongoose.Schema;
 
     // keysizeOverview Schema
-    var keysizeSchema = new Schema({
-	tld : String,
+    var keysizeTLDSchema = new Schema({
 	month : String,
-	totalAmount : Number,
-	publicKeyLength : Number
+	tld : String,
+	sumTLD: [{
+	    publicKeyLength : Number,
+	    totalAmount : Number
+	}]
     }, {
 	toObject : {
 	    virtuals : true
@@ -20,6 +22,6 @@
     });
 
     // Create Model using the keysizeSchema
-    var KeysizeSummary = mongoose.model('KeysizeOverview', keysizeSchema);
-    module.exports = KeysizeSummary;
+    var KeysizeTLD = mongoose.model('KeysizeTLD', keysizeTLDSchema);
+    module.exports = KeysizeTLD;
 }());
