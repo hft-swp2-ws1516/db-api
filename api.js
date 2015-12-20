@@ -117,7 +117,11 @@
     });
 
     schedule.scheduleJob('45 3 * * *', function(){
-        spawn('node', ['./queries/expOverview.js'], { stdio: 'inherit' });
+        spawn('node', ['./queries/expOverviewGlobal.js'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('45 3 * * *', function(){
+        spawn('node', ['./queries/expOverviewPerTld.js'], { stdio: 'inherit' });
     });
 
     schedule.scheduleJob('50 3 * * *', function(){
