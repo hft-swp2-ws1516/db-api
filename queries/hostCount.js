@@ -51,9 +51,8 @@
                 totalHosts: -1
             }}
         ]).allowDiskUse(true).exec(function(err, result) {
-            // store the hostCount objects in this array
+            // prepare tld specific hostcount objects
             var hostCounts = [];
-            // here we count the number of all distinct hosts
             var totalHosts = 0;
             for (var i = 0; i < result.length; i++) {
                 var hostCount = new HostCount();

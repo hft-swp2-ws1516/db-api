@@ -2,11 +2,14 @@
     'use strict';
 
     var path = require('path');
+    var async = require('async');
     var moment = require('moment');
     var mongoose = require('mongoose');
 
     var Scan = require('../schemas/scanSchema');
     var ExpOverview = require('../schemas/expOverviewSchema');
+
+    var TLD_UNSPECIFIED = "__all";
 
     // running as module or standalone?
     var standalone = !module.parent;
@@ -39,7 +42,8 @@
             { $sort: {scanDate: -1} },
             { $group: {
                 _id: "$domain",
-                ciphers: {$first: "$ciphers" }
+                ciphers: {$first: "$ciphers" },
+                tld: {$first: "$tld" }
             }},
             // unwind every cipher
             { $unwind : "$ciphers" },
@@ -47,56 +51,46 @@
             { $project: {
                 _id: 0,
                 domain: "$_id",
+                tld: 1,
                 cipher: "$ciphers"
             }},
             // group by domain
             { $group: {
                 _id: "$domain",
+                tld: {$first: "$tld" }
             }},
             // just count the result
             { $group: {
-                _id: null,
+                _id: "$tld",
                 count: {$sum: 1}
             }}
         ]).allowDiskUse(true).exec(function(err, result) {
-            var countEnabled = result[0].count;
-            console.log(countEnabled);
 
-            // count total distinct number of hosts
-            Scan.aggregate([
-                { $match: {
-                    $and: [
-                        {scanDate: {$gte: monthStart.toDate()}},
-                        {scanDate: {$lte: monthEnd.toDate()}}
-                    ]
-                }},
-                { $sort: {scanDate: -1} },
-                { $group: {
-                    _id: "$domain",
-                }},
-                { $group: {
-                    _id: null,
-                    count: {$sum: 1}
-                }}
-            ]).allowDiskUse(true).exec(function(err, distinctHosts) {
-                // prepare a ExpOverview object
-                var countTotal = distinctHosts[0].count;
+            // prepare expOverview object per tld
+            var expOverviews = [];
+            for (var i = 0; i < result.length; i++) {
                 var expOverview = new ExpOverview();
                 expOverview.month = monthStart.year() + '_' + (monthStart.month()+1);
-                expOverview.expEnabled = countEnabled;
-                expOverview.expDisabled = countTotal - countEnabled;
-                expOverview.total = countTotal;
+                expOverview.expEnabled = result[i].count;
+                expOverview.tld = result[i]._id;
+                expOverviews.push(expOverview);
+            }
 
+            // insert every tld specific result into mongo
+            async.eachLimit(expOverviews, 10, function(expOverview, callback){
                 // get plain data, which we will insert into mongo
                 var plainData = expOverview.toObject();
                 delete plainData._id;
 
                 // save the aggregated data to mongo
-                ExpOverview.findOneAndUpdate({month: expOverview.month}, plainData, {upsert:true}, function(err, doc){
-                    if (err) { throw err; }
-                    console.log('Aggregation done', scriptName);
-                    if (standalone) { mongoose.disconnect(); }
+                var upsertQuery = {month: expOverview.month, tld: expOverview.tld };
+                ExpOverview.findOneAndUpdate(upsertQuery, plainData, {upsert:true}, function(err, doc){
+                    callback();
                 });
+            }, function(){
+                if (err) { throw err; }
+                console.log('Aggregation done', scriptName);
+                if (standalone) { mongoose.disconnect(); }
             });
         });
     };
