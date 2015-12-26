@@ -46,7 +46,7 @@
     // create the express app, router & configure port
     var app = express();
     var router = express.Router();
-    var apiPort = process.env.TLSORT || 1337;
+    var apiPort = process.env.TLSPORT || 1337;
 
     // use morgan to log
     app.use(morgan('dev'));
