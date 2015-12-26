@@ -22,11 +22,11 @@
         var key = fs.readFileSync('./ssl.key');
         var cert = fs.readFileSync('./ssl.crt');
         // load passphrase from file
-        var pass = require('./ssl-pass');
+        //var pass = require('./ssl-pass');
         https_options = {
             key: key,
-            cert: cert,
-            passphrase: pass.passphrase
+            cert: cert
+            //passphrase: pass.passphrase
         };
     } catch(err) {
         if (err) { use_ssl = false; }
