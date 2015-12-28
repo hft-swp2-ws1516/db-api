@@ -12,7 +12,13 @@
                 tld: req.query.tld || TLD_UNSPECIFIED
             };
 
-            AuthOverview.find(query).exec(function(err, result){
+            AuthOverview.aggregate([
+                { $match: query },
+                { $group: {
+                    _id: "$month",
+                    auths: {$push: "$$ROOT"}
+                }}
+            ]).exec(function(err, result){
                 if (err) { res.status(500).send(err); }
                 res.status(200).json(result);
                 res.end();
