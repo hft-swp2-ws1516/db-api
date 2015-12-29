@@ -74,6 +74,7 @@
     router.use('/hostcount', require('./routes/hostcount'));
     router.use('/auth', require('./routes/auth'));
     router.use('/enc', require('./routes/enc'));
+    router.use('/kx', require('./routes/kx'));
 
     // register base & default router
     app.use(apiBaseUrl, router);
@@ -152,6 +153,14 @@
 
     schedule.scheduleJob('20 4 * * *', function(){
         spawn('node', ['./queries/encOverviewPerTld.js'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('25 4 * * *', function(){
+        spawn('node', ['./queries/kxOverviewGlobal.js'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('30 4 * * *', function(){
+        spawn('node', ['./queries/kxOverviewPerTld.js'], { stdio: 'inherit' });
     });
 
     // start the server
