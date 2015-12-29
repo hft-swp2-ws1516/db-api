@@ -145,6 +145,14 @@
         spawn('node', ['./queries/authOverviewPerTld.js'], { stdio: 'inherit' });
     });
 
+    schedule.scheduleJob('15 4 * * *', function(){
+        spawn('node', ['./queries/encOverviewGlobal.js'], { stdio: 'inherit' });
+    });
+
+    schedule.scheduleJob('20 4 * * *', function(){
+        spawn('node', ['./queries/encOverviewPerTld.js'], { stdio: 'inherit' });
+    });
+
     // start the server
     console.log('\n* starting the tls api\n');
     console.log('  mongodb:  ' + mongoConnection);
