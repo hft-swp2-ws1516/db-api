@@ -73,6 +73,7 @@
     router.use('/keysize', require('./routes/keysize'));
     router.use('/hostcount', require('./routes/hostcount'));
     router.use('/auth', require('./routes/auth'));
+    router.use('/enc', require('./routes/enc'));
 
     // register base & default router
     app.use(apiBaseUrl, router);
