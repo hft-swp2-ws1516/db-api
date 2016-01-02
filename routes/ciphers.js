@@ -14,6 +14,8 @@
 
             CipherSummary.find(query).exec(function(err, result){
                 if (err) { res.status(500).send(err); }
+                // remove last month, because reasons
+                result.pop();
                 res.status(200).json(result);
                 res.end();
             });
