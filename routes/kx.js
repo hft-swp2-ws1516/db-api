@@ -17,6 +17,11 @@
                 { $group: {
                     _id: "$month",
                     kxs: {$push: "$$ROOT"}
+                }},
+                { $project: {
+                    month: "$_id",
+                    _id: 0,
+                    kxs: 1
                 }}
             ]).exec(function(err, result){
                 if (err) { res.status(500).send(err); }
