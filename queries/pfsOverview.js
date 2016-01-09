@@ -50,7 +50,7 @@
             }},
             // match only these ciphers, where PFS is supported
             { $match: {
-                $or: [{"cipher.kx": "ECDH"}, {"cipher.kx": "DH"}]
+                "cipher.ephemeral": true
             }},
             // group the ciphers back by there domain
             { $group: {
